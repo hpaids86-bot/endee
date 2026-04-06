@@ -626,7 +626,7 @@ public:
                     LOG_INFO(2017, index_id, "Saving dirty index during shutdown");
                     saveIndex(index_id);
                 } catch(const std::exception& e) {
-                    LOG_ERROR(2017,
+                    LOG_ERROR(2015,
                                     index_id,
                                     "Failed to save index during shutdown: " << e.what());
                 }
@@ -909,7 +909,7 @@ public:
                 std::shared_lock<std::shared_mutex> lock(indices_mutex_);
                 auto it = indices_.find(index_id);
                 if(it != indices_.end() && it->second && it->second->is_dirty) {
-                    LOG_INFO(2023, index_id, "Saving dirty index before reload");
+                    LOG_INFO(2055, index_id, "Saving dirty index before reload");
                     saveIndex(index_id);
                 }
             }
@@ -1167,7 +1167,7 @@ public:
             throw;
         } catch(const std::exception& e) {
             LOG_ERROR(2027, index_id, "Batch insertion failed: " << e.what());
-            return false;
+            throw std::runtime_error(std::string("Batch insertion failed: ") + e.what());
         }
     }
 
@@ -1983,7 +1983,7 @@ inline void IndexManager::executeBackupJob(const std::string& index_id, const st
 
         // Check stop_token before expensive operations
         if (st.stop_requested()) {
-            LOG_INFO(2046, index_id, "Backup cancelled");
+            LOG_INFO(2056, index_id, "Backup cancelled before backup work started");
             backup_store_.clearActiveBackup(username);
             return;
         }
@@ -2004,7 +2004,7 @@ inline void IndexManager::executeBackupJob(const std::string& index_id, const st
 
             // Check again after acquiring lock (shutdown may have been requested while waiting)
             if (st.stop_requested()) {
-                LOG_INFO(2047, index_id, "Backup cancelled");
+                LOG_INFO(2057, index_id, "Backup cancelled");
                 backup_store_.clearActiveBackup(username);
                 return;
             }
